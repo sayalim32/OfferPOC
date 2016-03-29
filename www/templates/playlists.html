@@ -1,9 +1,15 @@
 <ion-view view-title="Promotions">
   <ion-content>
     <ion-list>
-      <ion-item ng-repeat="playlist in playlists" href="#/app/playlists/{{playlist.id}}">
-        {{playlist.title}}
-      </ion-item>
+      <ion-item  ng-repeat="playlist in playlists">
+    	<a class="item item-icon-left item-positive rounded-corner" href="#/app/playlists/{{playlist.id}}">
+    	 <i ng-if ="playlist.id=='C001'"class="icon ion-android-restaurant"></i>
+       <i ng-if ="playlist.id=='C002'"class="icon ion-medkit "></i>
+       <i ng-if ="playlist.id=='C003'"class="icon ion-tshirt "></i>
+       <i ng-if ="playlist.id=='C004'"class="icon ion-home "></i>
+        {{playlist.title}}    
+        </a> 
+      </ion-item>    
     </ion-list>
   </ion-content>
 </ion-view>

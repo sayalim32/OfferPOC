@@ -15,9 +15,61 @@ $royal:                           #886aea !default;
 $dark:                            #444 !default;
 */
 
+
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 
+$positive:                        #0070BA !default;
+.auth-pane {
+    background: url(../img/background.jpg) no-repeat center center fixed; 
+    -webkit-background-size: 100%;
+    -moz-background-size: 100%;
+    background-size: 100%;
+}
+
+.auth-pane1 {
+    background: url(../img/background1.jpg) no-repeat center center fixed; 
+    -webkit-background-size: 100%;
+    -moz-background-size: 100%;
+    background-size: 100%;
+}
+
+.larger {
+    font-size: 40px;
+    text-align: center;
+}
+
+.move-right{
+     text-align: center;
+     line-height: 80px;
+     
+}
+
+.menu{
+width: 300px;
+height: 80px;
+
+}
+
+.rounded-corner{
+    border-radius: 25px;
+}
+
+.align-center{
+text-align: center;
+}
+
+.ImageBorder
+{
+    padding:1px;
+    border:thin solid black;
+}
+
+.img-div {
+ width: 30px;
+ height:30px;
+border:thin solid black;
+}
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 

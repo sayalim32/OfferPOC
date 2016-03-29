@@ -1,16 +1,26 @@
 <ion-modal-view>
-   <ion-header-bar>
+   <ion-header-bar class ="bar-positive">
     <h1 class="title">Settings</h1>
     <div class="buttons">
       <button class="button button-clear" ng-click="closeSettings()">Close</button>
     </div>
   </ion-header-bar>
       <ion-content scroll="true">
-       <ion-toggle toggle-class="toggle-calm">Send Push Notifications</ion-toggle>
-       <h4>      Categories</h4>
-       <ion-checkbox ng-repeat="offercat in offerCategories" ng-model="offercat.catEnabled" ng-true-value="'YES'" ng-false-value="'NO'">{{offercat.catText}}</ion-checkbox>
-
-       <h1>
+      <div class ="item">
+       <ion-toggle toggle-class="toggle-positive">Send Push Notifications</ion-toggle>
+       </div>
+       <div class ="item item-positive"
+        <h3 class ="align-center">Categories</h3>
+        </div>
+        <ion-list>
+       <ion-checkbox  ng-repeat="offercat in offerCategories" ng-model="offercat.catEnabled" ng-true-value="'YES'" ng-false-value="'NO'">
+       
+       
+       {{offercat.catText}}  
+               
+       </ion-checkbox>
+       </ion-list>
+       
      <!--  <ion-checkbox>Dining</ion-checkbox>
        <ion-checkbox>Clothing & Fashion</ion-checkbox>
        <ion-checkbox>Health & Beauty</ion-checkbox>
