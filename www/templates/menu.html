@@ -29,28 +29,30 @@
            Login
              </a>
         </div>
-        <!--
-        <ion-item menu-close ng-click="login()">       
-        <ion-thumbnail item-left>
-        <img src="img/Login1.jpg">
-        </ion-thumbnail>
-        <h2>Login</h2>
-        </ion-item>
-        -->
         <div class="item " ng-controller ='SettingsCtrl' ng-click="openSettings()">
          <a class="item item-icon-left item-positive rounded-corner" href="#">
            <i class="icon ion-android-settings "></i>
            Settings
              </a>
-        </div>
-        
-        </ion-item>
+        </div>  
         <div class="item " menu-close href="#/app/playlists">
          <a class="item item-icon-left item-positive rounded-corner" href="#">
            <i class="icon ion-pricetags "></i>
            Promotions
              </a>
         </div>
+           <div class="item "  ng-controller ='PushOfferCtrl' ng-click="openOffer()">
+         <a class="item item-icon-left item-positive rounded-corner" href="#">
+           <i class="icon ion-star "></i>
+           Best Offer
+             </a>
+        </div>
+       <!-- <div class="item " menu-close ng-controller ='PushOfferNotifyCtrl' href="#/app/pushoffer">
+         <a class="item item-icon-left item-positive rounded-corner" href="#/app/pushoffer">
+           <i class="icon ion-star "></i>
+           Best Offer
+             </a>
+        </div>-->
         <!--
         <ion-item  menu-close href="#/app/playlists">
         <i class="icon icon-left ion-android-settings larger calm"></i>   
@@ -59,12 +61,8 @@
          <h2>Promotions</h2>
         </ion-thumbnail>
         </ion-item>-->
-      <div class="item " ng-controller ='PushOfferCtrl' ng-click="openOffer()">
-         <a class="item item-icon-left item-positive rounded-corner" href="#">
-           <i class="icon ion-star "></i>
-           Best Offer
-             </a>
-        </div>
+        
+   
       
         <!--
         <div class="item item-thumbnail-left" ng-controller ='PushOfferCtrl' ng-click="openOffer()">

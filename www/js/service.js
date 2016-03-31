@@ -4,71 +4,6 @@ angular.module('starter.services', [])
   return $stateParams;
 })
 
-.factory('GeoAlert', function() {
-   console.log('GeoAlert service instantiated');
-   var interval;
-   var duration = 6000;
-   var long, lat;
-   var custLat;
-   var custLong;
-   var processing = false;
-   var callback;
-   var minDistance = 0.25;
-    
-   // Credit: http://stackoverflow.com/a/27943/52160   
-   function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2-lat1);  // deg2rad below
-    var dLon = deg2rad(lon2-lon1); 
-    var a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-      ; 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    var d = R * c; // Distance in km
-    return d;
-   }
-  
-   function deg2rad(deg) {
-    return deg * (Math.PI/180)
-   }
-   
-   function hb() {
-      console.log('hb running');
-      if(processing) return;
-      processing = true;
-      navigator.geolocation.getCurrentPosition(function(position) {
-        processing = false;
-        console.log(lat, long);
-        custLat =position.coords.latitude;
-        custLong = position.coords.longitude;
-       // console.log('custlat :custlong ',custLat, custLong);
-        var dist = getDistanceFromLatLonInKm(lat, long, position.coords.latitude, position.coords.longitude);
-        console.log("dist in km is "+dist);
-        if(dist <= minDistance) callback();
-      });
-   }
-   
-   return {
-     begin:function(lt,lg,cb) {
-       long = lg;
-       lat = lt;
-       callback = cb;
-       interval = window.setInterval(hb, duration);
-       hb();
-     }, 
-     end: function() {
-       window.clearInterval(interval);
-     },
-     setTarget: function(lg,lt) {
-       long = lg;
-       lat = lt;
-     }
-   };
-   
-})
-
 .service('PlaylistService', function($q) {
   return {
     playlists: [
@@ -99,7 +34,7 @@ angular.module('starter.services', [])
   }
 })
 
-.service('PullOffersService', function() {
+.service('PullOffersService', function(){
 
  var custLat ;
  var custLong;
@@ -119,10 +54,27 @@ angular.module('starter.services', [])
   custLatLong = custLatLong.concat(custLat,',',custLong);
   console.log('inside getcurlocation: ' ,custLatLong);
   return custLatLong;
- }
+ };
+
+ var pullofferURL = function(){
+  /*
+var latLong = PullOffersService.getcurrlocation();
+$scope.categories = SettingsService.getCategories();
+console.log('categories:' ,$scope.categories);
+console.log(latLong);
+var lat = latLong.substring(0,latLong.indexOf(','));
+var long = latLong.substring(latLong.indexOf(',')+1,latLong.length);*/
+console.log('latitude :' ,custLat,' ',custLong);
+ var pullOffURL ='http://mopstub-anpadhi.rhcloud.com/api/offerLocations/pulloffers?custLat=';
+pullOffURL= pullOffURL.concat(custLat,'&custLong=',custLong); 
+console.log(pullOffURL);
+return pullOffURL;
+};
+
  return {
    currlocation : currlocation,
-   getcurrlocation : getcurrlocation
+   getcurrlocation : getcurrlocation,
+   pullofferURL : pullofferURL
 }
 })
 
@@ -143,7 +95,7 @@ angular.module('starter.services', [])
     localStorage.setItem(category.catId, category.catEnabled);  
     });   
     offerCatArr = offercategories;
-    console.log(offerCatArr[0].catEnabled);
+    //console.log(offerCatArr[0].catEnabled);
     },
 
     getCategories: function() {
@@ -159,18 +111,4 @@ angular.module('starter.services', [])
       return validCat;
     }
   }
-
-/*
-var offerCatarray = [];
-
-var setCategories = function(){
-angular.forEach(cat, function(category){
-  if(category.catEnable='true'){
-    offerCategories.push(category.catId);
-  }
-return 'true';  
-});
-console.log(offerCategories[0]);
-};
-*/
 });

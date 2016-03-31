@@ -12,7 +12,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
 
 //console.log('ApiEndpoint'+ApiEndpoint)
 
-.run(function($ionicPlatform, $rootScope, $timeout, GeoAlert) {
+.run(function($ionicPlatform, $rootScope, $timeout,$state) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -25,7 +25,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       //org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
-
+    //window.localStorage.setItem("IsLaunched","YES");
     var plot = cordova.require("cordova/plugin/plot");
         plot.init();
         console.log('after plot init');
@@ -35,95 +35,22 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
 }, function (err) {
     console.log("Failed to determine whether Plot is enabled: " + err);
 });
-    //------------Track Geo location
-       //Begin the service
-    //hard coded 'target'
-   /*
-    var lat = 19.187632;
-    var long = 73.223518;
-    function onConfirm(idx) {
-      console.log('button '+idx+' pressed');
-    }
-    
-    GeoAlert.begin(lat,long, function() {
+
+    if(window.localStorage.getItem("external_load") == "YES"){
+      console.log('inside getitem');
+      window.localStorage.setItem("external_load","NO");
+      var extload = window.localStorage.getItem("external_load");
+      console.log("extload: ",extload);
+      $state.go('app.pushoffernotify');
       
-      console.log('TARGET');
-      GeoAlert.end();
-      navigator.notification.confirm(
-        'You are near a target!',
-        onConfirm,
-        'Target!',
-        ['Cancel','View']
-      );
-      
-    });
-    */
-    //------------Track Geo location end
+    };
 
-
-    //----------------
-
-   /* if (window.cordova) {
-        document.addEventListener("deviceready", function() {
-        window.plugin.notification.local.onadd = onReminderAdd : function(id, state, json) {
-          $timeout(function() {
-            $rootScope.$broadcast('onReminderAdded', id, state, json)
-          }, 100);
-        };
-        window.plugin.notification.local.onclick = onReminderClick: function(id, state, json) {
-          $timeout(function() {
-            $rootScope.$broadcast('onReminderClick', id, state, json)
-          }, 100);
-        };
-        window.plugin.notification.local.oncancel = onReminderCancel: function(id, state, json) {
-          $timeout(function() {
-            $rootScope.$broadcast('onReminderCancel', id, state, json)
-          }, 100);
-        }; 
-        window.plugin.notification.local.ontrigger = onReminderTrigger: function(id, state, json) {
-          $timeout(function() {
-            $rootScope.$broadcast('onReminderTrigger', id, state, json)
-          }, 100);
-        };
-     }, false); */
-      
-    $rootScope.$on('$cordovaLocalNotification:schedule',
-      function (event, notification, state) {
-        console.log("SCHEDULE");
-        console.log('event', event);
-        console.log('notification', notification);
-        console.log('state', state);
-      });
-
-    $rootScope.$on('$cordovaLocalNotification:trigger',
-      function (event, notification, state) {
-        console.log("TRIGGER");
-        console.log('event', event);
-        console.log('notification', notification);
-        console.log('state', state);
-      });
-
-    $rootScope.$on('$cordovaLocalNotification:update',
-      function (event, notification, state) {
-        console.log('UPDATE');
-        console.log('event', event);
-        console.log('notification', notification);
-        console.log('state', state);
-      });
-
-    $rootScope.$on('$cordovaLocalNotification:cancel',
-      function (event, notification, state) {
-        console.log('CANCEL');
-        console.log('event', event);
-        console.log('notification', notification);
-        console.log('state', state);
-      });
-
-    //----------------
-
-  });
+    window.sessionStorage.setItem("IsLaunched","YES");
+});
 
 })
+
+
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
@@ -172,14 +99,41 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       }
     }
   })
-  .state('app.pushoffer', {
+  .state('app.pushoffer', { 
     url: '/pushoffer',
     views: {
       'menuContent': {
         templateUrl: 'templates/pushoffer.html'
       }
     }
+  })
+
+  .state('app.pushoffernotify', { 
+    url: '/pushoffernotify',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/pushoffernotify.html',
+        controller: 'PushOfferNotifyCtrl'
+      }
+    }
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/playlists');
 });
+
+function handleOpenURL(url) {  
+      console.log('recieved url :' ,url);
+      if(window.sessionStorage.getItem("IsLaunched")=="YES"){
+         console.log("inside launched")
+     var body = document.getElementsByTagName("body")[0];
+      var mainController = angular.element(body).scope();
+        mainController.reportAppLaunched(url);     
+    }
+    else{
+     // console.log("external_load: ", window.localStorage.getitem("external_load"));
+      window.localStorage.setItem("external_load","YES");
+       
+      }
+  // write code with the 'url' param
+  // to redirect to the corresponding page in your page
+}
