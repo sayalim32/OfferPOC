@@ -19,34 +19,35 @@
     </ion-header-bar>
    <!-- <ion-header-bar class="bar-calm title='<img class="title-image" src="/img/CitiOffers.png" />'">
     </ion-header-bar>-->
-    <ion-content>
-     
+    <ion-content class="background-all">
       <ion-list inset>
       
-      <div class="item  " ng-controller ='AppCtrl' ng-click="login()">
-           <a class="item item-icon-left item-positive rounded-corner" href="#">
-           <i class="icon ion-locked  "></i>
-           Login
-             </a>
-        </div>
-        <div class="item " ng-controller ='SettingsCtrl' ng-click="openSettings()">
-         <a class="item item-icon-left item-positive rounded-corner" href="#">
+        <div class="item background-all" ng-controller ='SettingsCtrl' ng-click="openSettings()">
+
+         <a class="item item-icon-left item-balanced rounded-corner " href="#">
            <i class="icon ion-android-settings "></i>
            Settings
              </a>
-        </div>  
-        <div class="item " menu-close href="#/app/playlists">
-         <a class="item item-icon-left item-positive rounded-corner" href="#">
+       </div>
+        <div class="item background-all" menu-close href="#/app/playlists">
+         <a class="item item-icon-left item-balanced rounded-corner" href="#/app/playlists">
            <i class="icon ion-pricetags "></i>
            Promotions
              </a>
         </div>
-           <div class="item "  ng-controller ='PushOfferCtrl' ng-click="openOffer()">
-         <a class="item item-icon-left item-positive rounded-corner" href="#">
+           <div class="item background-all"  ng-controller ='PushOfferCtrl' ng-click="openOffer()">
+         <a class="item item-icon-left item-balanced rounded-corner" href="#">
            <i class="icon ion-star "></i>
-           Best Offer
+          Best Offer
              </a>
         </div>
+         <div class="item background-all" menu-close ng-controller ='LoginCtrl' ng-click="doLogOut()">
+           <a class="item item-icon-left item-balanced rounded-corner" href="#">
+           <i class="icon ion-locked  "></i>
+           LogOut
+             </a>
+        </div>
+
        <!-- <div class="item " menu-close ng-controller ='PushOfferNotifyCtrl' href="#/app/pushoffer">
          <a class="item item-icon-left item-positive rounded-corner" href="#/app/pushoffer">
            <i class="icon ion-star "></i>
@@ -78,6 +79,7 @@
         </ion-item>
         -->
       </ion-list>
+
     </ion-content>
   </ion-side-menu>
 </ion-side-menus>

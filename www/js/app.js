@@ -44,7 +44,8 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       $state.go('app.pushoffernotify');
       
     };
-
+var isauth= window.sessionStorage.getItem("user");
+console.log('isauth startup: ', isauth);
     window.sessionStorage.setItem("IsLaunched","YES");
 });
 
@@ -71,7 +72,17 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       }
     }
   })
-
+/*
+  .state('app.login', {
+    url: '/login',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/login.html',
+        controller :'LoginCtrl'
+      }
+    }
+  })
+*/
   .state('app.browse', {
       url: '/browse',
       views: {

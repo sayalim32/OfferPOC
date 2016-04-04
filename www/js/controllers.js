@@ -1,6 +1,27 @@
 angular.module('starter.controllers', ['starter.services'])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+
+.factory('UserService', function ($rootScope, $q) {
+        return {
+            isAuthorized: function () {
+              console.log('inside isauth function');
+                if (window.sessionStorage.getItem('user') === null ) {
+                    $rootScope.$broadcast('user.notAuthorized'); 
+                    return false;
+                }
+                return true;
+            },
+
+            authorize: function (email, password) {
+                deffered = $q.defer();
+                // ...
+                return deffered.promise;
+            }
+        };
+    })
+
+/*
+.controller('AppCtrl', function($scope,$ionicModal, $timeout) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -40,7 +61,84 @@ angular.module('starter.controllers', ['starter.services'])
     }, 1000);
   };
 })
+*/
+.controller('LoginCtrl', function ($scope, $state,UserService,$ionicPopup, $ionicModal,LoginService) {
+  console.log('inside loginctrl');
+  $scope.data = {};
+  $scope.reportAppLaunched = function() {
+    console.log("App Launched Via Custom URL");
+   $state.go('app.pushoffernotify');
+  }
+        var initialized = false;
 
+        $ionicModal.fromTemplateUrl('templates/login.html', function(modal) {
+            $scope.modal = modal;
+        }, {
+            scope: $scope,
+            animation: 'slide-in-up'
+        });
+
+        // Open our new task modal
+        $scope.openLogin = function() {
+            $scope.modal.show();
+        };
+
+        $scope.closeLogin = function() {
+            $scope.modal.hide();
+        };
+
+        $scope.doLogOut = function() {
+          window.sessionStorage.setItem("user", null);
+          var isauth= window.sessionStorage.getItem("user");
+              console.log('logout: ', isauth);
+            $scope.modal.show();
+        };
+
+    $scope.doLogin = function() {
+      console.log('inside doLogin function');
+        LoginService.loginUser($scope.data.username, $scope.data.password).success(function(data) {
+            $scope.modal.hide();
+        }).error(function(data) {
+            var alertPopup = $ionicPopup.alert({
+                title: 'Login failed!',
+                template: 'Please check your credentials!'
+            });
+        });
+    }
+        $scope.$on('user.notAuthorized', function(e) {
+            if (!initialized) {
+                initialized = true;
+                //$scope.openModal();
+                setTimeout( function() {$scope.openLogin()}, 500);
+               window.sessionStorage.setItem("user", "AUTH");
+               var isauth= window.sessionStorage.getItem("user");
+              console.log('isauth: ', isauth);
+               
+
+            }
+        });
+
+        UserService.isAuthorized();
+    })
+
+/*
+.controller('LoginCtrl', function($scope, LoginService, $ionicPopup, $state) {
+    console.log('inside loginctrl');
+    $scope.data = {};
+ 
+    $scope.login = function() {
+      console.log('inside login1 function');
+        LoginService.loginUser($scope.data.username, $scope.data.password).success(function(data) {
+            $state.go('app');
+        }).error(function(data) {
+            var alertPopup = $ionicPopup.alert({
+                title: 'Login failed!',
+                template: 'Please check your credentials!'
+            });
+        });
+    }
+})
+*/
 .controller("MainController", [ '$scope','$state',function($scope,$state) {
 
   $scope.reportAppLaunched = function() {
@@ -52,6 +150,8 @@ angular.module('starter.controllers', ['starter.services'])
 
 .controller('PlaylistsCtrl', function($scope,PullOffersService) {
   console.log('inside PlaylistsCtrl');
+
+ 
   $scope.playlists = [   
     { title: 'Food & Dining', id: 'C001' },
     { title: 'Health & Beauty', id: 'C002' },
@@ -108,12 +208,23 @@ console.log('inside SettingsCtrl');
 
 })
 
-.controller('PlaylistCtrlTargated', function($scope, $http,$routeParams,PullOffersService) {
+.controller('PlaylistCtrlTargated', function($scope, $http,$routeParams,PullOffersService,$ionicLoading,$timeout) {
   $scope.offerList =[];
   $scope.pulloffURL="";
+   $scope.loadingIndicator = $ionicLoading.show({
+      content: 'Loading..',
+      animation: 'fade-in',
+      showBackdrop: false,
+      maxWidth: 200,
+      showDelay: 500
+  });
+   $timeout(function () {
+$ionicLoading.hide();
+  }, 5000);
   $scope.$on('$ionicView.enter', function(e) {
      $http.get(PullOffersService.pullofferURL())
     .success(function(response){
+      $ionicLoading.hide();
       console.log('response recieved');
       angular.forEach(response, function(offer){
         if ($routeParams.playlistId==offer.categoryType){
@@ -131,6 +242,7 @@ $scope.offerList =[];
 
   //url: 'http://mopstub-anpadhi.rhcloud.com/api'
 console.log('inside pushofferctrl');
+
 $scope.categories = "";
   $ionicModal.fromTemplateUrl('templates/pushoffer.html', {
     scope: $scope
@@ -163,17 +275,27 @@ $scope.categories = "";
   };
 })
 
-.controller('PushOfferNotifyCtrl', function($scope, $http,PullOffersService,SettingsService,$state) {
+.controller('PushOfferNotifyCtrl', function($scope, $http,PullOffersService,SettingsService,$ionicLoading,$timeout) {
   $scope.offerList =[];
 
-  //url: 'http://mopstub-anpadhi.rhcloud.com/api'
 console.log('inside pushoffernotifyctrl');
+ $scope.loadingIndicator = $ionicLoading.show({
+      content: 'Loading..',
+      animation: 'fade-in',
+      showBackdrop: false,
+      maxWidth: 200,
+      showDelay: 500
+  });
+   $timeout(function () {
+$ionicLoading.hide();
+  }, 5000);
 PullOffersService.currlocation();
 $scope.categories = "";
 $scope.$on('$ionicView.enter', function(e) {
   $scope.categories = SettingsService.getCategories();
   $http.get(PullOffersService.pullofferURL())
     .success(function(response){
+      $ionicLoading.hide();
       console.log('response recieved');
       var flag = true;
       angular.forEach(response, function(offer){
