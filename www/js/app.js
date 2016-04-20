@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic','ngCordova','starter.controllers', 'starter.services','ngStorage'])
 
 //.constant('ApiEndpoint', {
   //url: 'http://mopstub-anpadhi.rhcloud.com/api'
@@ -12,7 +12,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
 
 //console.log('ApiEndpoint'+ApiEndpoint)
 
-.run(function($ionicPlatform, $rootScope, $timeout,$state) {
+.run(function($window,$ionicPlatform, $rootScope, $timeout,$state,$document,$ionicLoading, $log,GeoAlert,$cordovaLocalNotification) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -25,7 +25,58 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       //org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+
+    var lat = 19.123770;
+    var long = 72.893577;
+    function onConfirm(idx) {
+      console.log('button '+idx+' pressed');
+    }
+    
+    GeoAlert.begin(lat,long, function() {
+      
+      console.log('TARGET');
+      /*
+      var now = new Date().getMilliseconds();
+        var _5SecondsFromNow = new Date(now + 5000);
+
+        $cordovaLocalNotification.schedule({
+          id: 2,
+          at: _5SecondsFromNow,
+          text: 'Click to view exciting offer in nearby stores!!',
+          title: 'CitiBankOffers',
+          icon: 'res://coffee.png',
+          smallIcon: 'res://social_usd.png',
+        }).then(function (result) {
+          console.log('After 5 sec Notification Set');
+        });
+
+        $rootScope.$on('$cordovaLocalNotification:click',
+      function (event, notification, state) {
+
+      console.log('Notification clicked');
+      $state.go('app.pushoffernotify');
+    }); */
+      });
+  cordova.plugins.backgroundMode.configure({
+    silent: true
+  });
+    cordova.plugins.backgroundMode.enable();
+
+    // Called when background mode has been activated
+   /* cordova.plugins.backgroundMode.onactivate = function () {
+      console.log('onactivate function');
+        setTimeout(function () {
+            // Modify the currently displayed notification
+            cordova.plugins.backgroundMode.configure({
+                text:'Running in background for more than 5s now.'
+            });
+        }, 5000);
+    }
+      */
+      
+    });
     //window.localStorage.setItem("IsLaunched","YES");
+    /*
     var plot = cordova.require("cordova/plugin/plot");
         plot.init();
         console.log('after plot init');
@@ -34,7 +85,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
     console.log("Plot is " + plotEnabledState);
 }, function (err) {
     console.log("Failed to determine whether Plot is enabled: " + err);
-});
+});*/
 
     if(window.localStorage.getItem("external_load") == "YES"){
       console.log('inside getitem');
@@ -47,18 +98,14 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
 var isauth= window.sessionStorage.getItem("user");
 console.log('isauth startup: ', isauth);
     window.sessionStorage.setItem("IsLaunched","YES");
-});
-
 })
-
-
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
 
     .state('app', {
     url: '/app',
-    abstract: true,
+     abstract: true,
     templateUrl: 'templates/menu.html'
   })
 
@@ -125,6 +172,15 @@ console.log('isauth startup: ', isauth);
       'menuContent': {
         templateUrl: 'templates/pushoffernotify.html',
         controller: 'PushOfferNotifyCtrl'
+      }
+    }
+  })
+  .state('app.savedoffers', { 
+    url: '/savedoffers',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/savedoffers.html',
+        controller: 'PlaylistCtrlTargated'
       }
     }
   });

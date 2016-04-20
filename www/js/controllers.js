@@ -1,4 +1,4 @@
-angular.module('starter.controllers', ['starter.services'])
+angular.module('starter.controllers', ['starter.services','ngStorage'])
 
 
 .factory('UserService', function ($rootScope, $q) {
@@ -20,48 +20,6 @@ angular.module('starter.controllers', ['starter.services'])
         };
     })
 
-/*
-.controller('AppCtrl', function($scope,$ionicModal, $timeout) {
-
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-  // Form data for the login modal
-  $scope.loginData = {};
-
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
-
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function() {
-    $scope.modal.hide();
-  };
-
-  // Open the login modal
-  $scope.login = function() {
-    $scope.modal.show();
-  };
-
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
-  };
-})
-*/
 .controller('LoginCtrl', function ($scope, $state,UserService,$ionicPopup, $ionicModal,LoginService) {
   console.log('inside loginctrl');
   $scope.data = {};
@@ -164,6 +122,8 @@ angular.module('starter.controllers', ['starter.services'])
 .controller('SettingsCtrl',function($scope,$ionicModal,SettingsService){
 console.log('inside SettingsCtrl');
 
+$scope.enablePush = { "checked":'YES'};
+
  $scope.offerCategories = [
 { catId : 'C001', catText : 'Food & Dining' , catEnabled : 'YES'
 },
@@ -175,7 +135,6 @@ console.log('inside SettingsCtrl');
 }
 ];
 
-  
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/search.html', {
@@ -189,6 +148,8 @@ console.log('inside SettingsCtrl');
     console.log('inside closesettings function');
     SettingsService.setCategories($scope.offerCategories);
     SettingsService.getCategories();
+    SettingsService.setPushNotification($scope.enablePush.checked);
+    SettingsService.getPushNotification();
     $scope.modal.hide();
   };
 
@@ -203,14 +164,35 @@ console.log('inside SettingsCtrl');
       i=i+1;
       
     });
+    $scope.enablePush.checked = SettingsService.getPushNotification();
     $scope.modal.show();
   };
 
 })
 
-.controller('PlaylistCtrlTargated', function($scope, $http,$routeParams,PullOffersService,$ionicLoading,$timeout) {
+.controller('PlaylistCtrlTargated', function($scope, $http,$routeParams,PullOffersService,$ionicLoading,$timeout,StorageService) {
   $scope.offerList =[];
   $scope.pulloffURL="";
+
+    $scope.savedoffer = localStorage.getItem("savedoffer")||"";
+  $scope.things =[];
+   $scope.things=StorageService.getAll();
+
+  $scope.add = function (newThing) {
+  if($scope.things.length>=4){
+  console.log('inside lenght exceeded');
+  alert ('Save Offer limit is exceeded. Please delete offers from Saved Offers tab to add new offers');
+  return;
+}
+   $scope.savedoffer= StorageService.add(newThing);
+
+  };
+
+  $scope.remove = function (thing) {
+    
+   $scope.savedoffer= StorageService.remove(thing);
+  };
+
    $scope.loadingIndicator = $ionicLoading.show({
       content: 'Loading..',
       animation: 'fade-in',
@@ -236,12 +218,30 @@ $ionicLoading.hide();
  
 })
 
-.controller('PushOfferCtrl', function($scope, $http,$ionicModal,PullOffersService,SettingsService) {
+.controller('PushOfferCtrl', function($scope, $http,$ionicModal,PullOffersService,SettingsService,StorageService) {
 
 $scope.offerList =[];
 
-  //url: 'http://mopstub-anpadhi.rhcloud.com/api'
+
 console.log('inside pushofferctrl');
+$scope.savedoffer = localStorage.getItem("savedoffer")||"";
+  $scope.things =[];
+   $scope.things=StorageService.getAll();
+
+  $scope.add = function (newThing) {
+  if($scope.things.length>=4){
+  console.log('inside lenght exceeded');
+  alert ('Save Offer limit is exceeded. Please delete offers from Saved Offers tab to add new offers');
+  return;
+}
+   $scope.savedoffer= StorageService.add(newThing);
+
+  };
+
+  $scope.remove = function (thing) {
+    
+   $scope.savedoffer= StorageService.remove(thing);
+  };
 
 $scope.categories = "";
   $ionicModal.fromTemplateUrl('templates/pushoffer.html', {
@@ -275,10 +275,28 @@ $scope.categories = "";
   };
 })
 
-.controller('PushOfferNotifyCtrl', function($scope, $http,PullOffersService,SettingsService,$ionicLoading,$timeout) {
+.controller('PushOfferNotifyCtrl', function($scope, $http,PullOffersService,SettingsService,$ionicLoading,$timeout,StorageService) {
   $scope.offerList =[];
-
+ 
 console.log('inside pushoffernotifyctrl');
+$scope.savedoffer = localStorage.getItem("savedoffer")||"";
+  $scope.things =[];
+   $scope.things=StorageService.getAll();
+
+  $scope.add = function (newThing) {
+  if($scope.things.length>=4){
+  console.log('inside lenght exceeded');
+  alert ('Save Offer limit is exceeded. Please delete offers from Saved Offers tab to add new offers');
+  return;
+}
+   $scope.savedoffer= StorageService.add(newThing);
+
+  };
+
+  $scope.remove = function (thing) {
+    
+   $scope.savedoffer= StorageService.remove(thing);
+  };
  $scope.loadingIndicator = $ionicLoading.show({
       content: 'Loading..',
       animation: 'fade-in',

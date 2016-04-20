@@ -24,7 +24,12 @@
     </div>
     <div>
         <a class="item item-icon-right" href="#">
-        <i class="icon ion-ios-flag-outline"></i>
+         <button class="button button-clear button-positive icon" ng-hide="savedoffer.indexOf(offer.offerID) > -1" ng-click="add(offer)">
+            <i class="ion-ios-flag-outline"></i>
+          </button>
+      <button class="button button-clear button-positive icon" ng-show="savedoffer.indexOf(offer.offerID) > -1">
+            <i class="ion-ios-flag"></i>
+      </button>
         <b class ="positive">{{offer.offerDescription}} </b>
       </a>
       </div>

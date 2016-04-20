@@ -1,7 +1,155 @@
-angular.module('starter.services', [])
+angular.module('starter.services', ['ngStorage'])
 
 .factory('$routeParams', function($stateParams) {
   return $stateParams;
+})
+
+
+.factory('GeoAlert', function($http,$cordovaLocalNotification,$rootScope,$state) {
+   console.log('GeoAlert service instantiated');
+   var interval;
+   var duration = 60000;
+   var long, lat;
+   var custLat;
+   var custLong;
+   var processing = false;
+   var callback;
+   var minDistance = 0.25;
+   var offercategories ="";
+   var offerList =[];
+   var datetime = new Date();
+   var offerCatArr = [
+{ catId : 'C001', catText : 'Food & Dining' , catEnabled : 'YES'
+},
+{ catId : 'C002', catText : 'Health & Beauty' , catEnabled : 'YES'
+},
+{ catId : 'C003', catText : 'Clothing & Fashion' , catEnabled : 'YES'
+},
+{ catId : 'C004', catText : 'Home & Electronics' , catEnabled : 'YES'
+}
+];
+
+   function getCategories () {
+      var i = 0;
+      var validCat ="";
+      offerCatArr.forEach(function(category) {
+        var isEnabled = localStorage.getItem(category.catId);
+        if (isEnabled === 'YES') { 
+          validCat = validCat.concat(category.catId,',');
+          }
+        console.log('category:',isEnabled,category.catId);
+       offerCatArr[i].catEnabled  = isEnabled;
+        i=i+1;
+
+      })
+offercategories = validCat;
+    }
+   
+   function success(pos){
+    var crd = pos.coords;
+
+  console.log('Your current position is:');
+  custLat = crd.latitude;
+  custLong = crd.longitude;
+   var pullOffURL ='http://mopstub-anpadhi.rhcloud.com/api/offerLocations/pulloffers?custLat=';
+        pullOffURL= pullOffURL.concat(custLat,'&custLong=',custLong); 
+         $http.get(pullOffURL)
+    .success(function(response){
+       console.log('response recieved',processing);
+      var flag = true;
+      angular.forEach(response, function(offer){
+        if (offercategories.includes(offer.categoryType) && flag === true){
+           offerList.push(offer);
+            flag = false;
+        }
+      });
+
+      if(offerList.length>0){
+          console.log('offerlist>0');
+          processing = true;
+          offerList=[];
+          datetime = new Date();
+          //var notText = "";
+          //notText=notText.concat(offerList.offerDescription);
+          $cordovaLocalNotification.schedule({
+          id: 2,
+          text: 'Click to view exciting offer in nearby stores!',
+          title: 'CitiBankOffers',
+          icon: 'res://drawable-hdpi/icon.png'
+        }).then(function (result) {
+          console.log('Notification sent');
+        });
+          
+        }
+
+
+});
+    
+   }
+
+   function error(err){
+console.warn('ERROR(' + err.code + '): ' + err.message);
+   }
+  
+   function hb() {
+      console.log('hb running');
+        var options = {
+       enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+        };
+
+      if(processing){
+        var now = new Date();
+        var _4hoursbeforenow = new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate(), datetime.getHours(), datetime.getMinutes() +5);
+        console.log('now :' ,now);
+        console.log('4hoursfromnow: ', _4hoursbeforenow);
+        if(_4hoursbeforenow <= now){
+          console.log('setting processing false');
+          processing =false;
+        }
+        else {
+          console.log('inside else');
+          return;
+        }
+      } 
+      //processing = true;
+      if(localStorage.getItem('enablePush')==='YES'){
+        console.log('inside scheduleNotification');
+        getCategories();
+        navigator.geolocation.getCurrentPosition(success, error);
+
+    }
+    else
+    {
+      console.log('Push Notification disabled');
+    }
+     $rootScope.$on('$cordovaLocalNotification:click',
+      function (event, notification, state) {
+
+      console.log('Notification clicked');
+      $state.go('app.pushoffernotify');
+    });
+   }
+
+   
+   return {
+     begin:function(lt,lg,cb) {
+       long = lg;
+       lat = lt;
+      // callback = cb;
+       interval = window.setInterval(hb, duration);
+       hb();
+     }, 
+     end: function() {
+       window.clearInterval(interval);
+     },
+     setTarget: function(lg,lt) {
+       long = lg;
+       lat = lt;
+     }
+   };
+   
 })
 
 .service('PlaylistService', function($q) {
@@ -101,7 +249,7 @@ return pullOffURL;
     getCategories: function() {
       var validCat ="";
       this.offerCatArr.forEach(function(category) {
-        var isEnabled = localStorage.getItem(category.catId);
+        var isEnabled = localStorage.getItem(category.catId)||'YES';
         console.log('category:',isEnabled,category.catId);
         if (isEnabled === 'YES') { 
           validCat = validCat.concat(category.catId,',');
@@ -109,6 +257,16 @@ return pullOffURL;
       })
       console.log('validcat :' ,validCat );
       return validCat;
+    },
+    setPushNotification : function(enablePush){
+      console.log('inside setPushNotification');
+      localStorage.setItem('enablePush',enablePush);
+    }
+    ,
+    getPushNotification : function(){
+       var enPush = localStorage.getItem('enablePush')||'YES';
+       console.log('enablePush', enPush);
+       return enPush;
     }
   }
 })
@@ -135,4 +293,42 @@ return pullOffURL;
             return promise;
         }
     }
+})
+
+.factory ('StorageService', function ($localStorage) {
+
+var savedoffer = localStorage.getItem("savedoffer")||""; 
+  $localStorage = $localStorage.$default({
+  things: []
+});
+var _getAll = function () {
+  return $localStorage.things;
+};
+var _add = function (thing) {
+  console.log('inside add thing');
+  $localStorage.things.push(thing);
+  var jsonObj = thing;
+    savedoffer = localStorage.getItem("savedoffer");
+    savedoffer= savedoffer.concat(jsonObj.offerID,',');
+    localStorage.setItem("savedoffer",savedoffer);
+    console.log('savedoffer string: ',savedoffer);
+    return savedoffer;
+    
+}
+var _remove = function (thing) {
+  console.log('inside remove thing');
+  var jsonObj = thing;
+    savedoffer= localStorage.getItem("savedoffer");
+    savedoffer=savedoffer.replace(jsonObj.offerID+',','');
+    localStorage.setItem("savedoffer",savedoffer);
+    console.log('remove:', savedoffer);
+  $localStorage.things.splice($localStorage.things.indexOf(thing), 1);
+  return savedoffer;
+}
+
+return {
+    getAll: _getAll,
+    add: _add,
+    remove: _remove
+  };
 });
